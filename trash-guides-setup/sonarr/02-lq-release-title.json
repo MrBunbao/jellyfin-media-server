@@ -1,0 +1,24 @@
+{
+  "name": "LQ (Release Title)",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "Low Quality Groups",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(HDTV|PDTV|DVDRip|WORKPRINT)\\b"
+      }
+    },
+    {
+      "name": "Bad Release Groups",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(MeGusta|RARBG|YIFY|YTS)\\b"
+      }
+    }
+  ]
+}

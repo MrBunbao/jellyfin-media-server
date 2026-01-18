@@ -1,0 +1,33 @@
+{
+  "name": "BluRay Tier 01",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "BluRay",
+      "implementation": "SourceSpecification",
+      "negate": false,
+      "required": true,
+      "fields": {
+        "value": 9
+      }
+    },
+    {
+      "name": "Not Remux",
+      "implementation": "QualityModifierSpecification",
+      "negate": true,
+      "required": true,
+      "fields": {
+        "value": 5
+      }
+    },
+    {
+      "name": "Top Tier Groups",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": true,
+      "fields": {
+        "value": "\\b(AEiKO|B0MBARDiERS|Chotab|D-Z0N3|FGT|NCmt|TDD|VARYG|W4NK3R)\\b"
+      }
+    }
+  ]
+}

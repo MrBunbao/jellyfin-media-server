@@ -1,0 +1,15 @@
+{
+  "name": "No-RlsGroup",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "No Release Group",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": true,
+      "fields": {
+        "value": "-\\b(((19|20)\\d{2})|\\d{3,4}p)\\b.*\\b(S\\d+).*"
+      }
+    }
+  ]
+}

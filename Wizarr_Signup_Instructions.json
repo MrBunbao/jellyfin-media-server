@@ -1,0 +1,91 @@
+{
+  "export_date": "2025-12-12T08:16:05.352330+00:00",
+  "export_type": "steps",
+  "steps": [
+    {
+      "server_type": "jellyfin",
+      "position": 0,
+      "title": "Join & download Jellyfin",
+      "markdown": "## {{ _(\"Join & Download Jellyfin for this device\") }}\n\n{{ _(\"Great news! You now have access to our media collection.\") }}\n\n{{ _(\"Planning on watching films on this device? Download the Jellyfin app first.\") }}\n\n[{{ _(\"Download\") }}](https://jellyfin.org/downloads){target=_blank .btn}",
+      "requires": [],
+      "require_interaction": false,
+      "category": "post_invite"
+    },
+    {
+      "server_type": "jellyfin",
+      "position": 0,
+      "title": "Welcome",
+      "markdown": "# Welcome to Our Media Server\n\nThanks for your interest in joining my shared media library; to help you get free from any streaming subscriptions that you may have to save some of that bread 🥖\n\n## What You're Getting Access To\n\n- **Movies** — A curated collection of films\n- **TV Shows** — Series old and new\n- **On-demand streaming** — Watch anytime, anywhere. \n\n*Possible hickups in your streaming if I have to restart the service for any reason. It takes less than 20 seconds so you might not even notice!*\n\n## *Before You Continue..*\n\nBy accepting this invitation, you agree to:\n\n- Keep your login credentials private. Or not lol. It's your life.\n- Not share access with others... JK. We're not Netflix. But it's free. Just ask for a invite link. \n- Stream responsibly. I'm not sure how you'll break this rule though, but don't try me. \n\nClick **Next** when you're ready to create your account.",
+      "requires": [],
+      "require_interaction": false,
+      "category": "pre_invite"
+    },
+    {
+      "server_type": "jellyfin",
+      "position": 1,
+      "title": "What is Jellyfin?",
+      "markdown": "## ℹ️ {{ _(\"Eh, so… what is Jellyfin?\") }}\n\n{{ _(\"Jellyfin is an open-source media server. With it you can stream films, \"\n      \"TV shows or music wherever you are, on any device.\") }}\n\n## 🍿 {{ _(\"How do I watch stuff?\") }}\n\n{{ _(\"Install the Jellyfin app, sign in with the details you just created, \"\n      \"and start streaming.\") }}",
+      "requires": [],
+      "require_interaction": false,
+      "category": "post_invite"
+    },
+    {
+      "server_type": "jellyfin",
+      "position": 1,
+      "title": "What You'll Need",
+      "markdown": "# What You'll Need\n\nBefore accepting, make sure you have:\n\n## Supported Devices\n\nJellyfin works on most devices including phones, tablets, smart TVs, and web browsers.\n\n## Recommended\n\n- Stable internet connection\n- Updated web browser (Chrome, Firefox, Safari)\n- The Jellyfin app for the best mobile experience\n\nReady to join? Click **Next** to accept your invitation.",
+      "requires": [],
+      "require_interaction": false,
+      "category": "pre_invite"
+    },
+    {
+      "server_type": "jellyfin",
+      "position": 2,
+      "title": "Tips for the best experience",
+      "markdown": "## 🎞 Get the best quality\n\n1. **Set streaming quality to original** – Settings → Playback  \n2. **Enable hardware decoding** if your device supports it for smoother 4K. 🍿  \n3. **Prefer Ethernet over Wi-Fi** on smart-TVs.",
+      "requires": [],
+      "require_interaction": false,
+      "category": "post_invite"
+    },
+    {
+      "server_type": "jellyfin",
+      "position": 3,
+      "title": "Save This URL!",
+      "markdown": "# ⚠️ IMPORTANT - Save This URL!\n\nWhen you open the Jellyfin app, it will ask for a **Server Address**.\n\n---\n\n## 📍 Your Server URL\n\n# https://stream.baolabs.io\n\n*(or https://watch.baolabs.io)*\n\n---\n\n## 📋 How to Connect\n\n1. **Long-press** the URL above to copy it\n2. Open the **Jellyfin app** on your device\n3. Tap **\"Add Server\"** or **\"Connect to Server\"**\n4. **Paste** the URL: `https://stream.baolabs.io`\n5. Sign in with your new account\n\n---\n\n📸 **Pro tip:** Take a screenshot of this page!\n\n👇 **Click below to confirm you've saved the URL:**\n\n[✅ I've copied the URL - Take me to Jellyfin!](https://stream.baolabs.io){.btn}",
+      "requires": [],
+      "require_interaction": true,
+      "category": "post_invite"
+    },
+    {
+      "server_type": "jellyfin",
+      "position": 4,
+      "title": "Download the Apps",
+      "markdown": "# 📲 Download the Jellyfin Apps\n\nStream on any device! Jellyfin has apps for all major platforms:\n\n## 📱 Mobile\n- **iOS** — iPhone & iPad\n- **Android** — Phones & Tablets\n\n## 📺 TV & Streaming Devices\n- **Amazon Fire TV**\n- **Android TV / Google TV**\n- **Roku**\n- **Apple TV**\n- **Samsung & LG Smart TVs** (via web browser)\n\n## 💻 Desktop\n- **Windows, Mac, Linux** — Native apps or use your web browser\n\n## 🎮 Gaming Consoles\n- **Xbox**\n- **PlayStation** (via web browser)\n\n---\nIn order to continue past this page, you'll need to click the link below to see all where you can stream from.\n\n[📥 All Jellyfin Clients](https://jellyfin.org/downloads/clients/){:target=\"_blank\" .btn}\n\nDownload the app for your device and sign in with your new account!",
+      "requires": [],
+      "require_interaction": true,
+      "category": "post_invite"
+    },
+    {
+      "server_type": "jellyfin",
+      "position": 5,
+      "title": "Important Links",
+      "markdown": "# 🔗 Your Important Links\n\n## 🎬 Watch Your Content (*the https:// is important*)\n\n# https://stream.baolabs.io\n\n*(or https://watch.baolabs.io)*\n\nOpen the Jellyfin app and enter the URL above to start streaming from an App, or go straight to the URL on the PC\n\n[🎬 Open Jellyfin](https://stream.baolabs.io){:target=\"_blank\" .btn}\n\n---\n\n## 🔍 Browse & Request New Content\n\nWant something we don't have? Browse the latest releases and request:\n\n[🍿 search.baolabs.io](https://search.baolabs.io){:target=\"_blank\" .btn}\n\n---\n\n📌 **Bookmark these links** for easy access!",
+      "requires": [],
+      "require_interaction": false,
+      "category": "post_invite"
+    },
+    {
+      "server_type": "jellyfin",
+      "position": 6,
+      "title": "You're All Set!",
+      "markdown": "# 🎉 You're All Set\\!\n\nWelcome to the family\\!\n\n---\n\n## 🔑 Don't Forget Your Server URL:\n\n# https://stream.baolabs.io\n\n## TYPE EXACTLY AS ABOVE. YOU NEED THE HTTPS://\n\nEnter this in your Jellyfin app to connect\\!\n\n---\n\n## Quick Recap\n\n| What | Where |\n|------|-------|\n| 📺 **Watch** | stream.baolabs.io |\n| 🍿 **Request** | search.baolabs.io |\n\n---\n\n🙏 **Enjoy the show\\!**\n\n👇 Click below to start watching:\n\n[🎬 Start Watching Now](https://stream.baolabs.io){.btn}",
+      "requires": [],
+      "require_interaction": true,
+      "category": "post_invite"
+    }
+  ],
+  "total_count": 9,
+  "server_types": [
+    "jellyfin"
+  ]
+}

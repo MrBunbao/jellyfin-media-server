@@ -1,0 +1,15 @@
+{
+  "name": "Scene",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "Scene Release",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(ARROW|CiNEFiLE|RARBG|SCENE)\\b"
+      }
+    }
+  ]
+}

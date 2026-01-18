@@ -1,0 +1,15 @@
+{
+  "name": "Season Pack",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "Season Pack",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": true,
+      "fields": {
+        "value": "\\b(S\\d+)([ ]Complete)|(Complete[ ]Season)|(Complete[ ]Series)\\b"
+      }
+    }
+  ]
+}

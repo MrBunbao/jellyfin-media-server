@@ -1,0 +1,24 @@
+{
+  "name": "TrueHD Atmos",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "TrueHD",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": true,
+      "fields": {
+        "value": "\\b(True-?HD)\\b"
+      }
+    },
+    {
+      "name": "ATMOS",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": true,
+      "fields": {
+        "value": "\\b(ATMOS)\\b"
+      }
+    }
+  ]
+}

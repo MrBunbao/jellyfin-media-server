@@ -1,0 +1,24 @@
+{
+  "name": "WEB Scene",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "WEBDL|WEBRip",
+      "implementation": "SourceSpecification",
+      "negate": false,
+      "required": true,
+      "fields": {
+        "value": 7
+      }
+    },
+    {
+      "name": "Scene Groups",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": true,
+      "fields": {
+        "value": "\\b(CAKES|CasStudio|ETHEL|KiNGS|MZABI|NTb|PHOENiX|PSA|RTFM)\\b"
+      }
+    }
+  ]
+}

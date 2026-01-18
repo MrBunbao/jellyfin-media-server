@@ -1,0 +1,15 @@
+{
+  "name": "HDR10+",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "HDR10+",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": true,
+      "fields": {
+        "value": "\\bHDR10(\\+|PLUS)\\b"
+      }
+    }
+  ]
+}

@@ -1,0 +1,776 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/${MEDIA_SERVICE}
+    container_name: ${MEDIA_SERVICE}
+    group_add:
+      - "44"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - VERSION=docker
+      - TZ=${TZ}
+      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel-25.13.33276.16
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/${MEDIA_SERVICE}:/config
+      - ${INSTALL_DIRECTORY}/config/jellyfin/custom-cont-init.d:/custom-cont-init.d
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - TZ=${TZ}
+      - LOG_LEVEL=debug
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/jellyseerr:/app/config
+    ports:
+      - 5055:5055
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+
+  cleanuparr:
+    image: ghcr.io/cleanuparr/cleanuparr:latest
+    container_name: cleanuparr
+    restart: unless-stopped
+    ports:
+      - "11011:11011"
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/cleanuparr:/config
+    environment:
+      - PORT=11011
+      - BASE_PATH=
+      - PUID=1000
+      - PGID=10
+      - UMASK=022
+      - TZ=${TZ}
+
+  # qBittorrent - stays behind Gluetun
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - WEBUI_PORT=8889
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/qbittorrent:/config
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+
+  # SABnzbd - NOT behind Gluetun; publish directly
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/sabnzbd:/config
+    ports:
+      - 8072:8080
+    restart: unless-stopped
+
+  autobrr:
+    container_name: autobrr
+    image: ghcr.io/autobrr/autobrr:latest
+    restart: unless-stopped
+    #logging:
+    #  driver: json-file
+    #  options:
+    #    max-file: ${DOCKERLOGGING_MAXFILE}
+    #    max-size: ${DOCKERLOGGING_MAXSIZE}
+    user: 1000:10
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/autobrr:/config
+    ports:
+      - 7474:7474
+
+  huntarr:
+    image: huntarr/huntarr:latest
+    container_name: huntarr
+    restart: always
+    ports:
+      - "9705:9705"
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/huntarr:/config
+    environment:
+      - TZ=America/New_York
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/sonarr:/config
+    ports:
+      - 8989:8989
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.13
+
+  radarr:
+    image: lscr.io/linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/radarr:/config
+    ports:
+      - 7878:7878
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.14
+
+  swaparr-radarr:
+    image: ghcr.io/thijmengthn/swaparr:latest
+    container_name: swaparr-radarr
+    restart: unless-stopped
+    environment:
+      - BASEURL=http://radarr:7878
+      - APIKEY=${RADARR_APIKEY}
+      - PLATFORM=radarr
+      - MAX_STRIKES=${SWAPARR_MAX_STRIKES}
+      - SCAN_INTERVAL=${SWAPARR_SCAN_INTERVAL}
+      - MAX_DOWNLOAD_TIME=${SWAPARR_MAX_DOWNLOAD_TIME}
+      - IGNORE_ABOVE_SIZE=${SWAPARR_IGNORE_ABOVE_SIZE}
+      - REMOVE_FROM_CLIENT=${SWAPARR_REMOVE_FROM_CLIENT}
+      - DRY_RUN=${SWAPARR_DRY_RUN}
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    depends_on:
+      - radarr
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.24
+
+  swaparr-sonarr:
+    image: ghcr.io/thijmengthn/swaparr:latest
+    container_name: swaparr-sonarr
+    restart: unless-stopped
+    environment:
+      - BASEURL=http://sonarr:8989
+      - APIKEY=${SONARR_APIKEY}
+      - PLATFORM=sonarr
+      - MAX_STRIKES=${SWAPARR_MAX_STRIKES}
+      - SCAN_INTERVAL=${SWAPARR_SCAN_INTERVAL}
+      - MAX_DOWNLOAD_TIME=${SWAPARR_MAX_DOWNLOAD_TIME}
+      - IGNORE_ABOVE_SIZE=${SWAPARR_IGNORE_ABOVE_SIZE}
+      - REMOVE_FROM_CLIENT=${SWAPARR_REMOVE_FROM_CLIENT}
+      - DRY_RUN=${SWAPARR_DRY_RUN}
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    depends_on:
+      - sonarr
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.25
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr
+    container_name: lidarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      #- /etc/localtime:/etc/localtime:ro
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/lidarr:/config
+    ports:
+      - 8686:8686
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.15
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/bazarr:/config
+    ports:
+      - 6767:6767
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.16
+
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:latest
+    container_name: recyclarr
+    user: ${PUID}:${PGID}
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/recyclarr:/config
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.26
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr
+    container_name: prowlarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/prowlarr:/config
+    restart: unless-stopped
+
+  # Gluetun - only the ports needed for qBittorrent + optional admin/SS
+  gluetun:
+    image: qmcgaw/gluetun:v3
+    container_name: gluetun
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8888:8888/tcp # HTTP Proxy
+      - 6881:6881 # qBittorrent TCP
+      - 6881:6881/udp # qBittorrent UDP
+      - 8003:8000/tcp # Gluetun admin (optional)
+      - 8083:8081/tcp # Gluetun port shifted to 8083
+      - 8889:8889/tcp # qBittorrent WebUI
+      - 9696:9696/tcp # Prowlarr WebUI
+      - 8388:8388/tcp # Shadowsocks (optional)
+      - 8388:8388/udp # Shadowsocks (optional)
+    environment:
+      - TZ=${TZ}
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - HTTPPROXY=on
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${PROTON_WG_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDR}
+      - PORT_FORWARD_ONLY=on
+      - VPN_PORT_FORWARDING=on
+      - SERVER_COUNTRIES=United States
+      - UPDATER_PERIOD=24h
+      - FIREWALL_OUTBOUND_SUBNETS=172.60.0.0/24
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.18
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:v3.4.1
+    container_name: flaresolverr
+    environment:
+      - TZ=${TZ}
+      - LOG_LEVEL=info
+      - PROXY_URL=http://gluetun:8888 # routes via Gluetun proxy
+    ports:
+      - 8191:8191
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.21
+
+  # watchtower: # DISABLED - was causing cascading container restarts
+  #   image: containrrr/watchtower
+  #   container_name: watchtower
+  #   environment:
+  #     - WATCHTOWER_CLEANUP=true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   dns:
+  #     - 100.100.100.100
+  #     - 8.8.8.8
+  #   restart: unless-stopped
+  #   networks:
+  #     yams_network:
+  #       ipv4_address: 172.60.0.20
+
+  # qBitManage - Automated torrent management and seeding
+  qbitmanage:
+    image: ghcr.io/stuffanthings/qbit_manage:latest
+    container_name: qbitmanage
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/qbitmanage:/config
+    environment:
+      - QBIT_USER=${QBIT_USER}
+      - QBIT_PASS=${QBIT_PASS}
+      - QBT_WEB_SERVER=false
+      - QBT_CONFIG_DIR=/config
+      - QBT_SCHEDULE=180
+      - QBT_STARTUP_DELAY=15
+      - QBT_TAG_NOHARDLINKS=true
+      - QBT_SHARE_LIMITS=true
+      - QBT_DRY_RUN=false
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.50
+
+  wizarr:
+    container_name: wizarr
+    image: ghcr.io/wizarrrr/wizarr
+    ports:
+      - 5690:5690
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${INSTALL_DIRECTORY}/wizarr:/data
+    environment:
+      - PUID=1000
+      - PGID=10
+      - DISABLE_BUILTIN_AUTH=false
+      - TZ=${TZ}
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.23
+
+#  flood:
+#    container_name: flood
+#    image: jesec/flood:latest
+#    user: "${PUID}:${PGID}"
+#    ports:
+#      - 3001:3000
+#    volumes:
+#      - ${INSTALL_DIRECTORY}/config/flood:/home/download/.local/share/flood
+#    environment:
+#      - HOME=/home/download
+#      - TZ=${TZ}
+#    restart: unless-stopped
+#    networks:
+#      yams_network:
+#        ipv4_address: 172.60.0.22
+#    depends_on:
+#      - qbittorrent
+
+  whisparr:
+    image: ghcr.io/hotio/whisparr:v3
+    container_name: whisparr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/whisparr:/config
+    ports:
+      - 6969:6969
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.27
+
+
+  subgen:
+    image: mccloud/subgen:cpu
+    container_name: subgen
+    environment:
+      - TZ=${TZ}
+      - WHISPER_MODEL=medium
+      - TRANSCRIBE_DEVICE=cpu
+      - CONCURRENT_TRANSCRIPTIONS=1
+      - SUBTITLE_LANGUAGE_NAME=en
+      - SKIP_IF_INTERNAL_SUBTITLES_LANGUAGE=eng
+      - PROCADDEDMEDIA=true
+      - PROCMEDIAONPLAY=false
+      - NAMESUBLANG=aa
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/subgen/models:/subgen/models
+    ports:
+      - 9876:9000
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.28
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.32.1  # Pinned - auto-update broke DB compatibility
+    container_name: meilisearch
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    environment:
+      - MEILI_ENV=production
+      - MEILI_MASTER_KEY=${MEILISEARCH_MASTER_KEY}
+      - MEILI_NO_ANALYTICS=true
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/meilisearch:/meili_data
+    ports:
+      - 7700:7700
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.29
+
+  # ============================================
+  # NEW SERVICES - Added 2025-12-27
+  # ============================================
+
+  # Jellystat - Jellyfin statistics and analytics
+  jellystat-db:
+    image: postgres:15-alpine
+    container_name: jellystat-db
+    environment:
+      - POSTGRES_USER=jellystat
+      - POSTGRES_PASSWORD=${JELLYSTAT_DB_PASSWORD}
+      - POSTGRES_DB=jellystat
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/jellystat/db:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.30
+
+  jellystat:
+    image: cyfershepard/jellystat:latest
+    container_name: jellystat
+    environment:
+      - POSTGRES_USER=jellystat
+      - POSTGRES_PASSWORD=${JELLYSTAT_DB_PASSWORD}
+      - POSTGRES_IP=jellystat-db
+      - POSTGRES_PORT=5432
+      - JWT_SECRET=${JELLYSTAT_JWT_SECRET}
+      - TZ=${TZ}
+    ports:
+      - 3033:3000
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/jellystat/data:/app/backend/backup-data
+    depends_on:
+      - jellystat-db
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.31
+
+  # Tdarr - Distributed transcode automation
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    container_name: tdarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK_SET=002
+      - serverIP=0.0.0.0
+      - serverPort=8266
+      - webUIPort=8265
+      - internalNode=true
+      - internalNodeFFmpegPath=/usr/local/bin/ffmpeg
+      - nodeName=InternalNode
+    ports:
+      - 8265:8265
+      - 8266:8266
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/tdarr/server:/app/server
+      - ${INSTALL_DIRECTORY}/config/tdarr/configs:/app/configs
+      - ${INSTALL_DIRECTORY}/config/tdarr/logs:/app/logs
+      - ${MEDIA_DIRECTORY}:/media
+      - ${MEDIA_DIRECTORY}/transcode_cache:/temp
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.32
+
+  # Unpackerr - Extract downloads for *arr apps
+  unpackerr:
+    image: golift/unpackerr:latest
+    container_name: unpackerr
+    environment:
+      - TZ=${TZ}
+      - UN_SONARR_0_URL=http://sonarr:8989
+      - UN_SONARR_0_API_KEY=${SONARR_APIKEY}
+      - UN_SONARR_0_PATHS_0=/data/torrents/tv
+      - UN_SONARR_0_PROTOCOLS=torrent
+      - UN_RADARR_0_URL=http://radarr:7878
+      - UN_RADARR_0_API_KEY=${RADARR_APIKEY}
+      - UN_RADARR_0_PATHS_0=/data/torrents/movies
+      - UN_RADARR_0_PROTOCOLS=torrent
+      - UN_LIDARR_0_URL=http://lidarr:8686
+      - UN_LIDARR_0_API_KEY=${LIDARR_APIKEY}
+      - UN_LIDARR_0_PATHS_0=/data/torrents/music
+      - UN_LIDARR_0_PROTOCOLS=torrent
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.34
+
+  # Readarr - Ebook management (NOTE: Project retired June 2025, but still functional)
+  readarr:
+    image: ghcr.io/hotio/readarr:latest
+    container_name: readarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/readarr:/config
+      - ${MEDIA_DIRECTORY}:/data
+    ports:
+      - 8787:8787
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.35
+
+
+  # Homarr - Dashboard for your homelab
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    environment:
+      - TZ=${TZ}
+      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_KEY}
+    ports:
+      - 7575:7575
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${INSTALL_DIRECTORY}/config/homarr/appdata:/appdata
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.39
+
+  # Janitorr - Auto-cleanup of old unwatched media
+  janitorr:
+    image: ghcr.io/schaka/janitorr:jvm-stable
+    platform: linux/amd64
+    container_name: janitorr
+    user: ${PUID}:${PGID}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/janitorr/application.yml:/config/application.yml:ro
+      - ${INSTALL_DIRECTORY}/config/janitorr/logs:/logs
+      - ${MEDIA_DIRECTORY}:/data
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.40
+
+  # TVHeadend - Live TV and DVR backend for HDHomeRun
+  tvheadend:
+    image: lscr.io/linuxserver/tvheadend:latest
+    container_name: tvheadend
+    network_mode: host
+    group_add:
+      - "44"
+    environment:
+      - PUID=1000
+      - PGID=10
+      - TZ=America/Denver
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/tvheadend:/config
+      - /volume4/mediaserver/recordings/tv:/recordings
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+
+
+  # Threadfin - M3U/XMLTV proxy for Jellyfin (replaces xTeVe + xmltv-sd)
+  # Approved by Schedules Direct: https://www.schedulesdirect.org/approvedsoftware
+  threadfin:
+    image: fyb3roptik/threadfin:latest
+    container_name: threadfin
+    environment:
+      - PUID=1000
+      - PGID=10
+      - TZ=America/Denver
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/threadfin:/home/threadfin/conf
+      - /tmp/threadfin:/tmp/threadfin:rw
+    ports:
+      - 34400:34400
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.41
+
+  # Schedules Direct XMLTV Grabber - uses tv_grab_zz_sdjson (approved by SD)
+  # Serves XMLTV at http://localhost:51969/tvxml.xml
+  sd-xmltv:
+    image: mrorbitman/schedules-direct-update-and-serve:latest
+    container_name: sd-xmltv
+    environment:
+      - SCHEDULES_DIRECT_USERNAME=${SD_USERNAME}
+      - SCHEDULES_DIRECT_PASSWORD=${SD_PASSWORD}
+      - SD_LINEUPS=USA-OTA-84084
+      - SD_FETCH_DAYS=7
+      - TZ=America/Denver
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/sd-xmltv:/var/www/html
+    ports:
+      - 51969:80
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.45
+
+  # XMLTV SchedulesDirect Grabber - DISABLED (replaced by Threadfin)
+  # WARNING: xmltv-sd used tv_grab_sd_json which is BANNED by Schedules Direct
+  #xmltv-sd:
+  #  image: huxy/xmltv-sd-json:latest
+  #  container_name: xmltv-sd
+  #  environment:
+  #    - TZ=${TZ}
+  #    - DAYS=14
+  #    - STARTUPDAYS=14
+  #  volumes:
+  #    - ${INSTALL_DIRECTORY}/config/xmltv-sd:/config
+  #    - ${INSTALL_DIRECTORY}/config/jellyfin/data/xmltv:/data
+  #  restart: unless-stopped
+  #  networks:
+  #    yams_network:
+  #      ipv4_address: 172.60.0.42
+
+
+  # Trailarr - Automatic trailer downloader for movies and TV shows
+  trailarr:
+    image: nandyalu/trailarr:latest
+    container_name: trailarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/trailarr:/config
+      - ${MEDIA_DIRECTORY}:/data
+    ports:
+      - 7889:7889
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.43
+
+  # Sportarr - Sports event tracking and downloading
+  sportarr:
+    image: sportarr/sportarr:latest
+    container_name: sportarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=022
+      - TZ=${TZ}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/sportarr:/config
+      - ${MEDIA_DIRECTORY}:/data
+      - ${MEDIA_DIRECTORY}/sports:/sports
+    ports:
+      - 1867:1867
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.48
+
+  # Anchorr - Discord bot for media requests and notifications
+  anchorr:
+    image: nairdah/anchorr:latest
+    container_name: anchorr
+    environment:
+      - WEBHOOK_PORT=8282
+      - NODE_ENV=production
+      - TZ=${TZ}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/anchorr:/usr/src/app/config
+    ports:
+      - 8282:8282
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.46
+
+  # XMLTV Schedules Direct Grabber with Artwork Support
+  # Uses tv_grab_az_sdjson_sqlite (SD Approved, includes channel icons & program artwork)
+  xmltv-sd:
+    image: xmltv-sd:1.4.0-artwork
+    container_name: xmltv-sd
+    environment:
+      - TZ=America/Denver
+      - GRAB_DAYS=14
+      - CRON_SCHEDULE=0 3 * * *
+      - ARTWORK_WIDTH=720
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/xmltv-grabber/data:/config
+      - ${INSTALL_DIRECTORY}/config/xmltv-grabber/output:/output
+      - ${INSTALL_DIRECTORY}/config/jellyfin/data:/jellyfin-data
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.47
+
+networks:
+  yams_network:
+    name: yams_network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.60.0.0/24
+    driver_opts:
+      com.docker.network.bridge.name: yams_br

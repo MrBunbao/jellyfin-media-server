@@ -1,0 +1,33 @@
+{
+  "name": "LQ (Release Title)",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "Low Quality Groups",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(BRrip|CAM|HDTC|HDTV|R5|SCREENER|TC|TS|TELECINE|TELESYNC|VHS|WORKPRINT)\\b"
+      }
+    },
+    {
+      "name": "yify",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(yify|YTS)\\b"
+      }
+    },
+    {
+      "name": "RARBG",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(RARBG|RARBG\\.to)\\b"
+      }
+    }
+  ]
+}

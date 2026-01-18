@@ -1,0 +1,32 @@
+# Secrets and credentials
+.env
+*.env
+protonvpn_credentials.txt
+api_keys.md
+
+# Config directories with sensitive data
+config/
+
+# Backups
+*.tar.gz
+backups/
+*.bak
+*.bak.*
+compose.backup
+
+# Logs
+*.log
+
+# Editor and temp files
+*.swp
+*.swo
+*~
+.DS_Store
+*.new
+
+# Claude Code (local-only, not for public repo)
+.claude/
+CLAUDE.md
+
+# Wizarr database/sessions
+wizarr/

@@ -1,0 +1,60 @@
+{
+  "name": "LQ",
+  "includeCustomFormatWhenRenaming": false,
+  "specifications": [
+    {
+      "name": "Bad Dual Groups",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(-IGUANA|-JETIX|-VPPV)\\b"
+      }
+    },
+    {
+      "name": "EVO except WEB-DL",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\bEVO(?!.*\\bWEB-DL\\b)\\b"
+      }
+    },
+    {
+      "name": "STUTTERSHIT",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(STUTTERSHIT)\\b"
+      }
+    },
+    {
+      "name": "x265 720p",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(x265|HEVC).*720p\\b"
+      }
+    },
+    {
+      "name": "3D",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(3D|SBS|Half-OU|Half-SBS)\\b"
+      }
+    },
+    {
+      "name": "x265 HD",
+      "implementation": "ReleaseTitleSpecification",
+      "negate": false,
+      "required": false,
+      "fields": {
+        "value": "\\b(x265|HEVC).*(?=720p|1080p)\\b"
+      }
+    }
+  ]
+}
