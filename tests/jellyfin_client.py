@@ -41,6 +41,58 @@ class JellyfinClient:
         return self._get(f"/Items/{item_id}").json()
 
     # ------------------------------------------------------------------
+    # Metadata management
+    # ------------------------------------------------------------------
+
+    def refresh_item(self, item_id: str, replace_all_metadata: bool = True,
+                     replace_all_images: bool = True) -> None:
+        """Trigger a metadata refresh for a single item.
+
+        POST /Items/{itemId}/Refresh
+        """
+        params = {
+            "metadataRefreshMode": "FullRefresh",
+            "imageRefreshMode": "FullRefresh",
+            "replaceAllMetadata": str(replace_all_metadata).lower(),
+            "replaceAllImages": str(replace_all_images).lower(),
+        }
+        resp = self.session.post(
+            f"{self.url}/Items/{item_id}/Refresh", params=params,
+        )
+        resp.raise_for_status()
+
+    def search_remote(self, item_id: str, media_type: str,
+                      provider_id: str, provider_name: str) -> list[dict]:
+        """Search remote metadata providers for matches.
+
+        POST /Items/RemoteSearch/{Type}
+        Returns a list of search result dicts.
+        """
+        type_map = {"tv": "Series", "movie": "Movie"}
+        search_type = type_map.get(media_type, media_type)
+        provider_ids = {provider_name: provider_id}
+        body = {"SearchInfo": {"ProviderIds": provider_ids}, "ItemId": item_id}
+        resp = self.session.post(
+            f"{self.url}/Items/RemoteSearch/{search_type}", json=body,
+        )
+        resp.raise_for_status()
+        return resp.json()
+
+    def apply_search_result(self, item_id: str,
+                            replace_all_images: bool = True) -> None:
+        """Apply a remote search result to re-identify an item.
+
+        POST /Items/RemoteSearch/Apply/{itemId}
+        """
+        params = {}
+        if replace_all_images:
+            params["ReplaceAllImages"] = "true"
+        resp = self.session.post(
+            f"{self.url}/Items/RemoteSearch/Apply/{item_id}", params=params,
+        )
+        resp.raise_for_status()
+
+    # ------------------------------------------------------------------
     # System / health
     # ------------------------------------------------------------------
 
