@@ -19,6 +19,11 @@ class JellyfinClient:
         resp.raise_for_status()
         return resp
 
+    def _delete(self, path: str, **kwargs) -> requests.Response:
+        resp = self.session.delete(f"{self.url}{path}", **kwargs)
+        resp.raise_for_status()
+        return resp
+
     # ------------------------------------------------------------------
     # Library endpoints
     # ------------------------------------------------------------------
@@ -91,6 +96,17 @@ class JellyfinClient:
             f"{self.url}/Items/RemoteSearch/Apply/{item_id}", params=params,
         )
         resp.raise_for_status()
+
+    # ------------------------------------------------------------------
+    # Item management
+    # ------------------------------------------------------------------
+
+    def delete_item(self, item_id: str) -> None:
+        """Delete a library item by ID.
+
+        DELETE /Items/{itemId}
+        """
+        self._delete(f"/Items/{item_id}")
 
     # ------------------------------------------------------------------
     # System / health
