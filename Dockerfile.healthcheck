@@ -1,0 +1,20 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY scripts/ ./scripts/
+COPY tests/ ./tests/
+
+# Health check
+COPY scripts/healthcheck.sh /healthcheck.sh
+RUN chmod +x /healthcheck.sh
+
+HEALTHCHECK --interval=5m --timeout=10s --start-period=10m --retries=1 \
+    CMD /healthcheck.sh
+
+ENTRYPOINT ["python3", "scripts/scheduled_audit.py"]

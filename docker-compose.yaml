@@ -765,6 +765,39 @@ services:
       yams_network:
         ipv4_address: 172.60.0.47
 
+  # YAMS Health Check - Scheduled audit runner (US-010)
+  yams-healthcheck:
+    build:
+      context: .
+      dockerfile: Dockerfile.healthcheck
+    container_name: yams-healthcheck
+    environment:
+      - TZ=${TZ}
+      - AUDIT_SCHEDULE=${AUDIT_SCHEDULE:-0 3 * * 0}
+      - AUDIT_REPORT_DIR=/reports
+      - AUDIT_WEBHOOK_URL=${AUDIT_WEBHOOK_URL:-}
+      - AUDIT_RUN_ON_START=${AUDIT_RUN_ON_START:-true}
+      - AUDIT_MEDIA_ROOT=/data/media
+      - AUDIT_JANITORR_CFG=/app/config/janitorr/application.yml
+      - JELLYFIN_URL=http://jellyfin:8096
+      - JELLYFIN_API_KEY=${JELLYFIN_API_KEY}
+      - SONARR_URL=http://sonarr:8989
+      - SONARR_APIKEY=${SONARR_APIKEY}
+      - RADARR_URL=http://radarr:7878
+      - RADARR_APIKEY=${RADARR_APIKEY}
+    volumes:
+      - ${INSTALL_DIRECTORY}/tests/reports:/reports
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/janitorr:/app/config/janitorr:ro
+    depends_on:
+      - jellyfin
+      - sonarr
+      - radarr
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.49
+
 networks:
   yams_network:
     name: yams_network
