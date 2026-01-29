@@ -98,6 +98,22 @@ class JellyfinClient:
         resp.raise_for_status()
 
     # ------------------------------------------------------------------
+    # Collection management
+    # ------------------------------------------------------------------
+
+    def remove_from_collection(self, collection_id: str, item_ids: list[str]) -> None:
+        """Remove items from a Jellyfin collection (boxset).
+
+        DELETE /Collections/{collectionId}/Items?Ids={csv}
+        """
+        if not item_ids:
+            return
+        self._delete(
+            f"/Collections/{collection_id}/Items",
+            params={"Ids": ",".join(item_ids)},
+        )
+
+    # ------------------------------------------------------------------
     # Item management
     # ------------------------------------------------------------------
 
