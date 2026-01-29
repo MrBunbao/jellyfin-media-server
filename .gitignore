@@ -17,6 +17,14 @@ compose.backup
 # Logs
 *.log
 
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Ralph TUI
+.ralph-tui/
+
 # Editor and temp files
 *.swp
 *.swo
