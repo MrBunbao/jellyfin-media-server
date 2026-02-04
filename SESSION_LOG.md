@@ -4,6 +4,33 @@ Historical record of significant configuration changes and incident responses.
 
 ---
 
+## 2026-02-03: Anime Movies Library Created
+
+**Purpose:** Dedicated Jellyfin library for anime movies, separate from regular movies with anime-specific metadata providers.
+
+**Configuration:**
+- **Library Name:** Anime Movies
+- **Collection Type:** movies
+- **Container Path:** `/data/media/anime-movies`
+- **Host Path:** `/volume4/mediaserver/media/anime-movies`
+
+**Metadata Providers (ordered):**
+1. AniDB (primary)
+2. TheMovieDb (secondary)
+3. The Open Movie Database
+
+**Settings:**
+- NFO local metadata: Enabled
+- Language: Japanese (ja)
+- Country: Japan (JP)
+- Save local metadata: Enabled
+- Realtime monitoring: Enabled
+
+**Related Services:**
+- radarr-anime (port 7879) manages anime movie downloads to this folder
+
+---
+
 ## 2026-01-13: Live TV Migration
 
 **Issue:** The xmltv-sd container was using tv_grab_sd_json, a 10-year-old grabber that Schedules Direct explicitly warned would get the account blocked.
