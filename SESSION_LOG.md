@@ -4,6 +4,41 @@ Historical record of significant configuration changes and incident responses.
 
 ---
 
+## 2026-02-04: Anime Movies Migration to Radarr-Anime (US-013)
+
+**Purpose:** Migrate existing anime movies from the regular Movies library to the dedicated anime movies library managed by Radarr-Anime.
+
+**Movies Migrated:**
+1. **Demon Slayer: Kimetsu no Yaiba Infinity Castle (2025)** - tmdbId: 1311031 - ✅ HAS FILE (6.5GB)
+2. **Demon Slayer -Kimetsu no Yaiba- The Movie: Mugen Train (2020)** - tmdbId: 635302 - Monitored (no file)
+3. **JUJUTSU KAISEN: Hidden Inventory / Premature Death - The Movie (2025)** - tmdbId: 1338799 - Monitored (no file)
+4. **My Hero Academia: World Heroes' Mission (2021)** - tmdbId: 768744 - Monitored (no file)
+5. **Solo Leveling -ReAwakening- (2024)** - tmdbId: 1357633 - Monitored (no file)
+
+**Process:**
+1. Added all 5 anime movies to Radarr-Anime via API
+2. Created hardlink of Demon Slayer Infinity Castle file from `/data/media/movies` to `/data/media/anime-movies`
+3. Radarr-Anime detected and indexed the file automatically
+4. Removed all 5 anime movies from main Radarr (kept files for Demon Slayer since hardlinked)
+5. Deleted original movie folder from `/data/media/movies`
+6. Triggered Jellyfin library refresh
+
+**Hardlink Verification:**
+- Both files shared inode 220338619 (confirmed hardlink)
+- Link count = 2 before deletion, 1 after removing original
+- No duplicate storage used
+
+**Final State:**
+- **Radarr-Anime:** 5 movies (1 with file, 4 monitored/wanted)
+- **Main Radarr:** 0 anime movies (correctly removed)
+- **Jellyfin Anime Movies:** Library refreshed, will show Demon Slayer
+
+**Root Folders:**
+- Radarr-Anime: `/data/media/anime-movies`
+- Main Radarr: `/data/media/movies`
+
+---
+
 ## 2026-02-03: Sonarr-Anime Download Client & Indexer Configuration (US-007)
 
 **Purpose:** Connect Sonarr-Anime to indexers and download client for anime downloading.
