@@ -125,6 +125,30 @@ class JellyfinClient:
         self._delete(f"/Items/{item_id}")
 
     # ------------------------------------------------------------------
+    # Library management
+    # ------------------------------------------------------------------
+
+    def update_library_options(self, library_id: str, library_options: dict) -> None:
+        """Update library options for a virtual folder.
+
+        POST /Library/VirtualFolders/LibraryOptions
+        """
+        body = {"Id": library_id, "LibraryOptions": library_options}
+        resp = self.session.post(
+            f"{self.url}/Library/VirtualFolders/LibraryOptions",
+            json=body,
+        )
+        resp.raise_for_status()
+
+    def refresh_library(self) -> None:
+        """Trigger a full library scan.
+
+        POST /Library/Refresh
+        """
+        resp = self.session.post(f"{self.url}/Library/Refresh")
+        resp.raise_for_status()
+
+    # ------------------------------------------------------------------
     # System / health
     # ------------------------------------------------------------------
 
