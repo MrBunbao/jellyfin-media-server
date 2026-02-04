@@ -4,6 +4,67 @@ Historical record of significant configuration changes and incident responses.
 
 ---
 
+## 2026-02-03: Sonarr-Anime Download Client & Indexer Configuration (US-007)
+
+**Purpose:** Connect Sonarr-Anime to indexers and download client for anime downloading.
+
+**Changes Made:**
+
+1. **Added qBittorrent as download client**
+   - Host: gluetun (via VPN)
+   - Port: 8889
+   - Category: `anime` (saves to /data/torrents/anime)
+   - Username: admad
+
+2. **Nyaa.si indexer synced via Prowlarr**
+   - Nyaa.si was already in Prowlarr (id: 27)
+   - Forced application sync to add to Sonarr-Anime
+   - Now appears as "Nyaa.si (Prowlarr)" in Sonarr-Anime
+
+**Indexers Available (12 total):**
+- Torrent: AnimeTosho, EZTV, LimeTorrents, Nyaa.si, The Pirate Bay, TorrentDownload, Uindex
+- Usenet: altHUB, AnimeTosho (Usenet), NZBFinder, NZBgeek, NzbPlanet
+
+**Verification:**
+- Download client test: PASSED
+- Indexer connectivity test: PASSED
+- Search test ("one piece"): 979 results including Nyaa.si
+- Health check: No issues
+
+---
+
+## 2026-02-04: Prowlarr Integration for Anime Instances
+
+**Purpose:** Integrate Sonarr-Anime and Radarr-Anime with Prowlarr for automatic indexer sync.
+
+**Changes Made:**
+1. **Added Sonarr-Anime as Prowlarr application (id: 7)**
+   - Base URL: http://172.60.0.52:8989
+   - Sync Level: fullSync
+   - Categories: TV (5000-5090 including TV/Anime 5070)
+
+2. **Added Radarr-Anime as Prowlarr application (id: 8)**
+   - Base URL: http://172.60.0.53:7878
+   - Sync Level: fullSync
+   - Categories: Movies (2000-2090)
+
+3. **Created "anime" tag (id: 2) in Prowlarr**
+   - For selective indexer sync to anime instances
+
+4. **Tagged AnimeTosho indexers with anime tag:**
+   - AnimeTosho (id: 20) - torrent
+   - AnimeTosho (Usenet) (id: 22) - usenet
+
+**Indexers Synced:**
+- Sonarr-Anime: 11 indexers (including AnimeTosho)
+- Radarr-Anime: 10 indexers (including AnimeTosho)
+
+**Verification:**
+- Both applications visible in Prowlarr Settings > Apps
+- Indexers visible in both anime instances under Settings > Indexers
+
+---
+
 ## 2026-02-03: Anime Movies Library Created
 
 **Purpose:** Dedicated Jellyfin library for anime movies, separate from regular movies with anime-specific metadata providers.
