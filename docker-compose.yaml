@@ -131,6 +131,26 @@ services:
       yams_network:
         ipv4_address: 172.60.0.13
 
+  sonarr-anime:
+    image: lscr.io/linuxserver/sonarr
+    container_name: sonarr-anime
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/sonarr-anime:/config
+    ports:
+      - 8990:8989
+    dns:
+      - 100.100.100.100
+      - 8.8.8.8
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.52
+
   radarr:
     image: lscr.io/linuxserver/radarr
     container_name: radarr
@@ -798,6 +818,25 @@ services:
       yams_network:
         ipv4_address: 172.60.0.49
 
+
+  # YAMS Stack Health Monitor - Continuous health check daemon (US-001)
+  yams-monitor:
+    build:
+      context: ./monitor
+      dockerfile: Dockerfile
+    container_name: yams-monitor
+    environment:
+      - TZ=${TZ}
+      - CHECK_INTERVAL_SECONDS=${MONITOR_CHECK_INTERVAL:-60}
+      - LOG_LEVEL=${MONITOR_LOG_LEVEL:-INFO}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/monitor:/config
+    ports:
+      - 8087:8080
+    restart: always
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.51
 networks:
   yams_network:
     name: yams_network
