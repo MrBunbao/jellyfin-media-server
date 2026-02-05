@@ -17,7 +17,9 @@ Health audit tools for the YAMS media server stack. These scripts validate Jelly
 | `fix_leaving_soon.py` | Fix Janitorr Leaving Soon false positives |
 | `setup-uptime-kuma.py` | Configure Uptime Kuma monitors for YAMS containers (US-008) |
 | `setup-uptime-kuma-notifications.py` | Configure Discord notifications in Uptime Kuma (US-009) |
+| `setup-uptime-kuma-telegram-notifications.py` | Configure Telegram notifications in Uptime Kuma (US-010) |
 | `test-discord-webhook.sh` | Test Discord webhook connectivity (US-005) |
+| `test-telegram-webhook.sh` | Test Telegram bot connectivity (US-006) |
 
 ## Scheduled Health Check
 
@@ -177,11 +179,54 @@ Before configuring Uptime Kuma, test your webhook:
 ./scripts/test-discord-webhook.sh "https://discord.com/api/webhooks/..."
 ```
 
+### Telegram Notification Setup (US-010)
+
+The `setup-uptime-kuma-telegram-notifications.py` script configures Telegram alerts as a redundant notification channel:
+
+```bash
+# Using environment variables (recommended):
+export TELEGRAM_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ"
+export TELEGRAM_CHAT_ID="123456789"
+export UPTIME_KUMA_USERNAME="admin"
+export UPTIME_KUMA_PASSWORD="your-password"
+python3 scripts/setup-uptime-kuma-telegram-notifications.py
+
+# Or load from secrets file:
+source /volume4/docker-v4/yams/.secrets/telegram.env
+python3 scripts/setup-uptime-kuma-telegram-notifications.py
+
+# Or provide all arguments directly:
+python3 scripts/setup-uptime-kuma-telegram-notifications.py \
+    --username admin \
+    --password <password> \
+    --bot-token "123456789:ABCdefGHIjklMNOpqrSTUvwxYZ" \
+    --chat-id "123456789"
+```
+
+The script will:
+1. Create a "Telegram Alerts" notification provider
+2. Assign the notification to all existing monitors
+3. Set it as the default for new monitors
+
+### Testing Telegram Webhook
+
+Before configuring Uptime Kuma, test your Telegram bot:
+
+```bash
+./scripts/test-telegram-webhook.sh <bot_token> <chat_id>
+
+# Or using environment variables:
+source /volume4/docker-v4/yams/.secrets/telegram.env
+./scripts/test-telegram-webhook.sh
+```
+
 ### Environment Variables
 
 | Variable | Description |
 |----------|-------------|
 | `DISCORD_WEBHOOK_URL` | Discord webhook URL for alerts |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token from @BotFather |
+| `TELEGRAM_CHAT_ID` | Telegram chat ID (negative for groups) |
 | `UPTIME_KUMA_URL` | Uptime Kuma URL (default: http://localhost:3001) |
 | `UPTIME_KUMA_USERNAME` | Admin username |
 | `UPTIME_KUMA_PASSWORD` | Admin password |
