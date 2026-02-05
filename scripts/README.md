@@ -15,6 +15,9 @@ Health audit tools for the YAMS media server stack. These scripts validate Jelly
 | `fix_metadata.py` | Fix metadata mismatches between Jellyfin and Sonarr/Radarr |
 | `fix_library.py` | Clean up orphaned and duplicate Jellyfin entries |
 | `fix_leaving_soon.py` | Fix Janitorr Leaving Soon false positives |
+| `setup-uptime-kuma.py` | Configure Uptime Kuma monitors for YAMS containers (US-008) |
+| `setup-uptime-kuma-notifications.py` | Configure Discord notifications in Uptime Kuma (US-009) |
+| `test-discord-webhook.sh` | Test Discord webhook connectivity (US-005) |
 
 ## Scheduled Health Check
 
@@ -115,3 +118,70 @@ docker logs yams-healthcheck           # Full log history
 docker logs yams-healthcheck --tail 50 # Last 50 lines
 docker logs yams-healthcheck -f        # Follow live
 ```
+
+## Uptime Kuma Setup
+
+Uptime Kuma provides container monitoring with Discord notifications for the YAMS media stack.
+
+### Initial Monitor Setup (US-008)
+
+The `setup-uptime-kuma.py` script configures Docker container monitors:
+
+```bash
+# First time setup (creates admin account and monitors):
+python3 scripts/setup-uptime-kuma.py --setup --username admin --password <password>
+
+# Add monitors to existing Uptime Kuma:
+python3 scripts/setup-uptime-kuma.py --username admin --password <password>
+
+# Include additional YAMS containers:
+python3 scripts/setup-uptime-kuma.py --username admin --password <password> --all
+```
+
+### Discord Notification Setup (US-009)
+
+The `setup-uptime-kuma-notifications.py` script configures Discord alerts:
+
+```bash
+# Using environment variables (recommended):
+export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..."
+export UPTIME_KUMA_USERNAME="admin"
+export UPTIME_KUMA_PASSWORD="your-password"
+python3 scripts/setup-uptime-kuma-notifications.py
+
+# Or provide all arguments directly:
+python3 scripts/setup-uptime-kuma-notifications.py \
+    --username admin \
+    --password <password> \
+    --webhook-url "https://discord.com/api/webhooks/..."
+```
+
+The script will:
+1. Create a "Discord Alerts" notification provider
+2. Configure it with `@here` prefix for visibility
+3. Assign the notification to all existing monitors
+4. Set it as the default for new monitors
+
+### Notification Content
+
+Discord alerts include:
+- **Container name**: Which service went down
+- **Status**: DOWN or UP (recovered)
+- **Downtime duration**: How long the service was unavailable
+
+### Testing Webhook
+
+Before configuring Uptime Kuma, test your webhook:
+
+```bash
+./scripts/test-discord-webhook.sh "https://discord.com/api/webhooks/..."
+```
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DISCORD_WEBHOOK_URL` | Discord webhook URL for alerts |
+| `UPTIME_KUMA_URL` | Uptime Kuma URL (default: http://localhost:3001) |
+| `UPTIME_KUMA_USERNAME` | Admin username |
+| `UPTIME_KUMA_PASSWORD` | Admin password |
