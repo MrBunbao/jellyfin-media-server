@@ -3,6 +3,7 @@
 *.env
 protonvpn_credentials.txt
 api_keys.md
+.secrets/
 
 # Config directories with sensitive data
 config/
