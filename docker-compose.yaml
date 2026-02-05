@@ -70,6 +70,8 @@ services:
       - ${MEDIA_DIRECTORY}:/data
       - ${INSTALL_DIRECTORY}/config/qbittorrent:/config
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 256m
     network_mode: "service:gluetun"
 
   # SABnzbd - NOT behind Gluetun; publish directly
@@ -131,6 +133,8 @@ services:
       - 100.100.100.100
       - 8.8.8.8
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 256m
     networks:
       yams_network:
         ipv4_address: 172.60.0.13
@@ -151,6 +155,8 @@ services:
       - 100.100.100.100
       - 8.8.8.8
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 256m
     networks:
       yams_network:
         ipv4_address: 172.60.0.52
@@ -171,6 +177,8 @@ services:
       - 100.100.100.100
       - 8.8.8.8
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 256m
     networks:
       yams_network:
         ipv4_address: 172.60.0.14
@@ -191,6 +199,8 @@ services:
       - 100.100.100.100
       - 8.8.8.8
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 256m
     networks:
       yams_network:
         ipv4_address: 172.60.0.53
@@ -278,6 +288,8 @@ services:
       - 100.100.100.100
       - 8.8.8.8
     restart: unless-stopped
+    mem_limit: 512m
+    mem_reservation: 128m
     networks:
       yams_network:
         ipv4_address: 172.60.0.16
@@ -308,6 +320,8 @@ services:
     volumes:
       - ${INSTALL_DIRECTORY}/config/prowlarr:/config
     restart: unless-stopped
+    mem_limit: 512m
+    mem_reservation: 128m
 
   # Gluetun - only the ports needed for qBittorrent + optional admin/SS
   gluetun:
@@ -345,6 +359,8 @@ services:
       - 100.100.100.100
       - 8.8.8.8
     restart: unless-stopped
+    mem_limit: 512m
+    mem_reservation: 128m
     networks:
       yams_network:
         ipv4_address: 172.60.0.18
