@@ -19,6 +19,8 @@ services:
     restart: unless-stopped
     devices:
       - /dev/dri:/dev/dri
+    mem_limit: 4g
+    mem_reservation: 512m
 
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
@@ -34,6 +36,8 @@ services:
       - 100.100.100.100
       - 8.8.8.8
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 256m
 
   cleanuparr:
     image: ghcr.io/cleanuparr/cleanuparr:latest
@@ -515,6 +519,8 @@ services:
     volumes:
       - ${INSTALL_DIRECTORY}/config/jellystat/db:/var/lib/postgresql/data
     restart: unless-stopped
+    mem_limit: 512m
+    mem_reservation: 128m
     networks:
       yams_network:
         ipv4_address: 172.60.0.30
@@ -536,6 +542,8 @@ services:
     depends_on:
       - jellystat-db
     restart: unless-stopped
+    mem_limit: 512m
+    mem_reservation: 128m
     networks:
       yams_network:
         ipv4_address: 172.60.0.31
